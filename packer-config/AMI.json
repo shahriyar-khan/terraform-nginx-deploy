@@ -1,0 +1,44 @@
+{
+    "variables": {
+        "access_key": "{{env `access_key`}}",
+        "secret_key": "{{env `secret_key`}}" 
+    },
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "access_key": "{{user `access_key`}}",
+            "secret_key": "{{user `secret_key`}}",
+            "region": "us-east-1",
+            "ami_name": "nginx-ami",
+            "source_ami": "ami-09e67e426f25ce0d7",
+            "instance_type": "t2.micro",
+            "ssh_username": "ubuntu"
+
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "script": "nginx-install.sh"
+
+        },
+        {
+           "type": "file",
+           "source": "index.html",
+           "destination": "/tmp/" 
+        },
+        {
+            "type": "shell",
+            "inline": ["sudo cp /tmp/index.html /var/www/html/"]
+         }
+
+    ],
+    "post-processors": [
+        {
+            "type": "manifest",
+            "output": "output.json"
+        }
+    ],
+    "sensitive-variables": ["access_key", "secret_key"]
+    
+}
